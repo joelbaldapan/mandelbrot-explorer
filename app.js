@@ -298,7 +298,7 @@ function RunDemo(loadErrors, loadedShaders) {
     e.preventDefault();
     // Reset touch variables if needed
     previousTouchDistance = 0;
-    if (currentTouches === 1) finishedZoom = true;
+    if (currentTouches !== 2) finishedZoom = true;
   }
 
   // Modify the existing applyMomentum function to work with both mouse and touch inputs
