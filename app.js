@@ -222,7 +222,7 @@ function RunDemo(loadErrors, loadedShaders) {
   let touchStartX = 0;
   let touchStartY = 0;
   let previousTouchDistance = 0;
-  const mobileZoomMomentumFactor = 0.6;
+  const mobileZoomMomentumFactor = 2;
   const mobileMoveMomentumFactor = 0.07;
 
   // Add touch event listeners
