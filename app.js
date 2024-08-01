@@ -223,7 +223,7 @@ function RunDemo(loadErrors, loadedShaders) {
   let touchStartY = 0;
   let previousTouchDistance = 0;
   const mobileZoomMomentumFactor = 4;
-  const mobileMoveMomentumFactor = 0.1;
+  const mobileMoveMomentumFactor = 0.25;
   let isPanning = false;
   let isZooming = false;
 
