@@ -38,8 +38,8 @@ function RemoveEvent(object, type, callback) {
 function Init() {
   async.map(
     {
-      vsText: "/mandl.vs.glsl",
-      fsText: "/mandl.fs.glsl",
+      vsText: "./mandl.vs.glsl",
+      fsText: "./mandl.fs.glsl",
     },
     loadShaderAsync,
     RunDemo
