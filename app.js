@@ -103,6 +103,8 @@ function RunDemo(loadErrors, loadedShaders) {
     maxI: gl.getUniformLocation(program, "maxI"),
     minR: gl.getUniformLocation(program, "minR"),
     maxR: gl.getUniformLocation(program, "maxR"),
+    colorMode: gl.getUniformLocation(program, "colorMode"),
+    maxIterations: gl.getUniformLocation(program, "maxIterations"),
   };
 
   // Set CPU-side variables for all of our shader variables
@@ -111,6 +113,8 @@ function RunDemo(loadErrors, loadedShaders) {
   let maxI = 2.0;
   let minR = -2.0;
   let maxR = 2.0;
+  let currentColorMode = 1; // ADJUSTABLE
+  let maxIterations = 10000; // ADJUSTABLE
 
   // Create buffers
   const vertexBuffer = gl.createBuffer();
@@ -160,6 +164,8 @@ function RunDemo(loadErrors, loadedShaders) {
     gl.uniform1f(uniforms.maxI, maxI);
     gl.uniform1f(uniforms.minR, minR);
     gl.uniform1f(uniforms.maxR, maxR);
+    gl.uniform1i(uniforms.colorMode, currentColorMode);
+    gl.uniform1f(uniforms.maxIterations, maxIterations);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
@@ -181,8 +187,8 @@ function RunDemo(loadErrors, loadedShaders) {
   let velocityZoom = 0;
   const friction = 0.9;
 
-  const zoomMomentumFactor = 0.5;
-  const moveMomentumFactor = 0.1;
+  const zoomMomentumFactor = 0.6;
+  const moveMomentumFactor = 0.07;
 
   function OnZoom(e) {
     const zoomFactor = e.deltaY < 0 ? 0.95 : 1.05;
