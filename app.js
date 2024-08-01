@@ -222,6 +222,8 @@ function RunDemo(loadErrors, loadedShaders) {
   let touchStartX = 0;
   let touchStartY = 0;
   let previousTouchDistance = 0;
+  const mobileZoomMomentumFactor = 0.6;
+  const mobileMoveMomentumFactor = 0.07;
 
   // Add touch event listeners
   AddEvent(canvas, "touchstart", OnTouchStart);
@@ -261,12 +263,12 @@ function RunDemo(loadErrors, loadedShaders) {
       velocityX =
         (movementX / canvas.clientWidth) *
         rRange *
-        moveMomentumFactor *
+        mobileMoveMomentumFactor *
         currentZoom;
       velocityY =
         (movementY / canvas.clientHeight) *
         iRange *
-        moveMomentumFactor *
+        mobileMoveMomentumFactor *
         currentZoom;
 
       touchStartX = touchX;
@@ -282,7 +284,7 @@ function RunDemo(loadErrors, loadedShaders) {
 
       const pinchDelta = currentTouchDistance - previousTouchDistance;
       const zoomFactor = pinchDelta > 0 ? 0.99 : 1.01;
-      velocityZoom = (zoomFactor - 1) * zoomMomentumFactor;
+      velocityZoom = (zoomFactor - 1) * mobileZoomMomentumFactor;
 
       previousTouchDistance = currentTouchDistance;
     }
