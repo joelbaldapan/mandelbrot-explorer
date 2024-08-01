@@ -298,10 +298,18 @@ function RunDemo(loadErrors, loadedShaders) {
 
   function OnTouchEnd(e) {
     e.preventDefault();
-    // Reset touch variables if needed
-    previousTouchDistance = 0;
-    isPanning = false;
-    isZooming = false;
+    if (e.touches.length === 0) {
+      // Reset touch variables if no touches are active
+      previousTouchDistance = 0;
+      isPanning = false;
+      isZooming = false;
+    } else if (e.touches.length === 1) {
+      // If there is still one touch, it means we should transition to panning
+      isPanning = true;
+      isZooming = false;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    }
   }
 
   // Modify the existing applyMomentum function to work with both mouse and touch inputs
