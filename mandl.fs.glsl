@@ -28,30 +28,28 @@ vec3 hsbToRgb(float h, float s, float b) {
 }
 
 void main() {
-    // Adjust coordinates with respect to canvas width and height
+    // Adjust coordinates to the canvas width and height
     vec2 c = vec2(
         gl_FragCoord.x * (maxR - minR) / viewportDimensions.x + minR,
         gl_FragCoord.y * (maxI - minI) / viewportDimensions.y + minI
     );
 
-    // Mandelbrot formula:
+    // Calculate the mandelbrot set:
     vec2 z = c;
     float iterations = 0.0;
     float maxIterations = 20000.0;
     const int imaxIterations = 20000;
-    bool escaped = false;
-
+ 
     for (int i = 0; i < imaxIterations; i++) {
-        if (!escaped) {
-            float t = 2.0 * z.x * z.y + c.y;
-            z.x = z.x * z.x - z.y * z.y + c.x;
-            z.y = t;
+        float t = 2.0 * z.x * z.y + c.y;
+        z.x = z.x * z.x - z.y * z.y + c.x;
+        z.y = t;
 
-            if (z.x * z.x + z.y * z.y > 4.0) {
-                escaped = true;
-                iterations = float(i);
-            }
+        if (z.x * z.x + z.y * z.y > 4.0) {
+            break;
         }
+
+        iterations += 1.0;
     }
 
     if (iterations < maxIterations) {

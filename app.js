@@ -1,5 +1,7 @@
+"use strict";
+
 function loadShaderAsync(shaderURL, callback) {
-  const req = new XMLHttpRequest();
+  var req = new XMLHttpRequest();
   req.open("GET", shaderURL, true);
   req.onload = function () {
     if (req.status < 200 || req.status >= 300) {
@@ -9,17 +11,6 @@ function loadShaderAsync(shaderURL, callback) {
     }
   };
   req.send();
-}
-
-function Init() {
-  async.map(
-    {
-      vsText: "/mandl.vs.glsl",
-      fsText: "/mandl.fs.glsl",
-    },
-    loadShaderAsync,
-    RunDemo
-  );
 }
 
 function AddEvent(object, type, callback) {
@@ -44,7 +35,23 @@ function RemoveEvent(object, type, callback) {
   }
 }
 
+function Init() {
+  async.map(
+    {
+      vsText: "/mandl.vs.glsl",
+      fsText: "/mandl.fs.glsl",
+    },
+    loadShaderAsync,
+    RunDemo
+  );
+}
+
 function RunDemo(loadErrors, loadedShaders) {
+  // Attach callbacks
+  AddEvent(window, "resize", OnResizeWindow);
+  AddEvent(window, "wheel", OnZoom);
+  AddEvent(window, "mousemove", OnMouseMove);
+
   const canvas = document.getElementById("gl-surface");
   const gl = canvas.getContext("webgl");
   if (!gl) {
@@ -90,7 +97,7 @@ function RunDemo(loadErrors, loadedShaders) {
   gl.useProgram(program);
 
   // Get uniform locations
-  let uniforms = {
+  const uniforms = {
     viewportDimensions: gl.getUniformLocation(program, "viewportDimensions"),
     minI: gl.getUniformLocation(program, "minI"),
     maxI: gl.getUniformLocation(program, "maxI"),
@@ -99,11 +106,11 @@ function RunDemo(loadErrors, loadedShaders) {
   };
 
   // Set CPU-side variables for all of our shader variables
-  const vpDimensions = [canvas.clientWidth, canvas.clientHeight];
-  const minI = -2.0;
-  const maxI = 2.0;
-  const minR = -2.0;
-  const maxR = 2.0;
+  let vpDimensions = [canvas.clientWidth, canvas.clientHeight];
+  let minI = -2.0;
+  let maxI = 2.0;
+  let minR = -2.0;
+  let maxR = 2.0;
 
   // Create buffers
   const vertexBuffer = gl.createBuffer();
@@ -126,7 +133,6 @@ function RunDemo(loadErrors, loadedShaders) {
   );
   gl.enableVertexAttribArray(vPosAttrib);
 
-  const loop = function () {
     // Draw
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
@@ -142,4 +148,111 @@ function RunDemo(loadErrors, loadedShaders) {
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
+
+  OnResizeWindow();
+
+  //
+  // Event Listeners
+  //
+  function OnResizeWindow() {
+    if (!canvas) {
+      return;
+    }
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const stretch = 0.9;
+
+    vpDimensions = [canvas.clientWidth, canvas.clientHeight];
+
+    const oldRealRange = maxR - minR;
+    maxR =
+      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
+      minR;
+    const newRealRange = maxR - minR;
+
+    minR -= (newRealRange - oldRealRange) / 2;
+    maxR =
+      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
+      minR;
+
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+  }
+
+  function OnZoom(e) {
+    const imaginaryRange = maxI - minI;
+    let newRange;
+    if (e.deltaY < 0) {
+      newRange = imaginaryRange * 0.95;
+    } else {
+      newRange = imaginaryRange * 1.05;
+    }
+
+    const delta = newRange - imaginaryRange;
+
+    minI -= delta / 2;
+    maxI = minI + newRange;
+
+    OnResizeWindow();
+  }
+
+  //
+  // Event Listeners
+  //
+  function OnResizeWindow() {
+    if (!canvas) {
+      return;
+    }
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const stretch = 0.9;
+
+    vpDimensions = [canvas.clientWidth, canvas.clientHeight];
+
+    const oldRealRange = maxR - minR;
+    maxR =
+      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
+      minR;
+    const newRealRange = maxR - minR;
+
+    minR -= (newRealRange - oldRealRange) / 2;
+    maxR =
+      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
+      minR;
+
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+  }
+
+  function OnZoom(e) {
+    const imaginaryRange = maxI - minI;
+    let newRange;
+    if (e.deltaY < 0) {
+      newRange = imaginaryRange * 0.95;
+    } else {
+      newRange = imaginaryRange * 1.05;
+    }
+
+    const delta = newRange - imaginaryRange;
+
+    minI -= delta / 2;
+    maxI = minI + newRange;
+
+    OnResizeWindow();
+  }
+
+  function OnMouseMove(e) {
+    if (e.buttons === 1) {
+      const iRange = maxI - minI;
+      const rRange = maxR - minR;
+
+      const iDelta = (e.movementY / canvas.clientHeight) * iRange;
+      const rDelta = (e.movementX / canvas.clientWidth) * rRange;
+
+      minI += iDelta;
+      maxI += iDelta;
+      minR -= rDelta;
+      maxR -= rDelta;
+    }
+  }
 }
