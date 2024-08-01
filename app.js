@@ -114,11 +114,7 @@ function RunDemo(loadErrors, loadedShaders) {
 
   // Create buffers
   const vertexBuffer = gl.createBuffer();
-  const vertices = [
-    -1, 1, -1, -1, 1, -1,
-
-    -1, 1, 1, 1, 1, -1,
-  ];
+  const vertices = [-1, 1, -1, -1, 1, -1, -1, 1, 1, 1, 1, -1];
   gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
@@ -133,6 +129,28 @@ function RunDemo(loadErrors, loadedShaders) {
   );
   gl.enableVertexAttribArray(vPosAttrib);
 
+  let thisframetime;
+  let lastframetime = performance.now();
+  let dt;
+  let frames = [];
+  let lastPrintTime = performance.now();
+  const loop = function () {
+    // FPS information
+    thisframetime = performance.now();
+    dt = thisframetime - lastframetime;
+    lastframetime = thisframetime;
+    frames.push(dt);
+    if (lastPrintTime + 750 < thisframetime) {
+      lastPrintTime = thisframetime;
+      var average = 0;
+      for (var i = 0; i < frames.length; i++) {
+        average += frames[i];
+      }
+      average /= frames.length;
+      document.title = Math.round(1000 / average) + " fps";
+    }
+    frames = frames.slice(0, 250);
+
     // Draw
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
@@ -145,6 +163,8 @@ function RunDemo(loadErrors, loadedShaders) {
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
+    applyMomentum();
+
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
@@ -154,105 +174,94 @@ function RunDemo(loadErrors, loadedShaders) {
   //
   // Event Listeners
   //
-  function OnResizeWindow() {
-    if (!canvas) {
-      return;
-    }
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const stretch = 0.9;
+  // Momentum variables
+  let velocityX = 0;
+  let velocityY = 0;
+  let velocityZoom = 0;
+  const friction = 0.9;
 
-    vpDimensions = [canvas.clientWidth, canvas.clientHeight];
-
-    const oldRealRange = maxR - minR;
-    maxR =
-      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
-      minR;
-    const newRealRange = maxR - minR;
-
-    minR -= (newRealRange - oldRealRange) / 2;
-    maxR =
-      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
-      minR;
-
-    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-  }
+  const zoomMomentumFactor = 0.5;
+  const moveMomentumFactor = 0.1;
 
   function OnZoom(e) {
-    const imaginaryRange = maxI - minI;
-    let newRange;
-    if (e.deltaY < 0) {
-      newRange = imaginaryRange * 0.95;
-    } else {
-      newRange = imaginaryRange * 1.05;
-    }
-
-    const delta = newRange - imaginaryRange;
-
-    minI -= delta / 2;
-    maxI = minI + newRange;
-
-    OnResizeWindow();
+    const zoomFactor = e.deltaY < 0 ? 0.95 : 1.05;
+    velocityZoom = (zoomFactor - 1) * zoomMomentumFactor;
   }
 
-  //
-  // Event Listeners
-  //
-  function OnResizeWindow() {
-    if (!canvas) {
-      return;
-    }
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const stretch = 0.9;
-
-    vpDimensions = [canvas.clientWidth, canvas.clientHeight];
-
-    const oldRealRange = maxR - minR;
-    maxR =
-      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
-      minR;
-    const newRealRange = maxR - minR;
-
-    minR -= (newRealRange - oldRealRange) / 2;
-    maxR =
-      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
-      minR;
-
-    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-  }
-
-  function OnZoom(e) {
-    const imaginaryRange = maxI - minI;
-    let newRange;
-    if (e.deltaY < 0) {
-      newRange = imaginaryRange * 0.95;
-    } else {
-      newRange = imaginaryRange * 1.05;
-    }
-
-    const delta = newRange - imaginaryRange;
-
-    minI -= delta / 2;
-    maxI = minI + newRange;
-
-    OnResizeWindow();
+  function getCurrentZoom() {
+    return 4 / (maxI - minI); // Range is -2 to 2 (total of 4)
   }
 
   function OnMouseMove(e) {
     if (e.buttons === 1) {
       const iRange = maxI - minI;
       const rRange = maxR - minR;
+      const currentZoom = getCurrentZoom();
 
-      const iDelta = (e.movementY / canvas.clientHeight) * iRange;
-      const rDelta = (e.movementX / canvas.clientWidth) * rRange;
-
-      minI += iDelta;
-      maxI += iDelta;
-      minR -= rDelta;
-      maxR -= rDelta;
+      velocityX =
+        (e.movementX / canvas.clientWidth) *
+        rRange *
+        moveMomentumFactor *
+        currentZoom;
+      velocityY =
+        (e.movementY / canvas.clientHeight) *
+        iRange *
+        moveMomentumFactor *
+        currentZoom;
     }
+  }
+
+  function applyMomentum() {
+    if (
+      Math.abs(velocityX) > 0.00001 ||
+      Math.abs(velocityY) > 0.00001 ||
+      Math.abs(velocityZoom) > 0.00001
+    ) {
+      const iRange = maxI - minI;
+      const rRange = maxR - minR;
+
+      minR -= velocityX * rRange;
+      maxR -= velocityX * rRange;
+      minI += velocityY * iRange;
+      maxI += velocityY * iRange;
+
+      const zoomFactor = 1 + velocityZoom;
+      const newIRange = iRange * zoomFactor;
+      const deltaI = newIRange - iRange;
+      minI -= deltaI / 2;
+      maxI = minI + newIRange;
+
+      OnResizeWindow();
+
+      velocityX *= friction;
+      velocityY *= friction;
+      velocityZoom *= friction;
+    }
+  }
+
+  function OnResizeWindow() {
+    if (!canvas) {
+      return;
+    }
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const stretch = 0.9;
+
+    vpDimensions = [canvas.clientWidth, canvas.clientHeight];
+
+    const oldRealRange = maxR - minR;
+    maxR =
+      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
+      minR;
+    const newRealRange = maxR - minR;
+
+    minR -= (newRealRange - oldRealRange) / 2;
+    maxR =
+      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
+      minR;
+
+    gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   }
 }

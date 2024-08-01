@@ -37,8 +37,8 @@ void main() {
     // Calculate the mandelbrot set:
     vec2 z = c;
     float iterations = 0.0;
-    float maxIterations = 20000.0;
-    const int imaxIterations = 20000;
+    float maxIterations = 10000.0;
+    const int imaxIterations = 10000;
  
     for (int i = 0; i < imaxIterations; i++) {
         float t = 2.0 * z.x * z.y + c.y;
