@@ -222,10 +222,10 @@ function RunDemo(loadErrors, loadedShaders) {
   let touchStartX = 0;
   let touchStartY = 0;
   let previousTouchDistance = 0;
-  let currentTouches = 0;
-  let finishedZoom = true;
   const mobileZoomMomentumFactor = 4;
   const mobileMoveMomentumFactor = 0.1;
+  let isPanning = false;
+  let isZooming = false;
 
   // Add touch event listeners
   AddEvent(canvas, "touchstart", OnTouchStart);
@@ -234,10 +234,14 @@ function RunDemo(loadErrors, loadedShaders) {
 
   function OnTouchStart(e) {
     e.preventDefault();
-    touchStartX = e.touches[0].clientX;
-    touchStartY = e.touches[0].clientY;
-
-    if (e.touches.length === 2) {
+    if (e.touches.length === 1) {
+      isPanning = true;
+      isZooming = false;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+      isPanning = false;
+      isZooming = true;
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       previousTouchDistance = Math.hypot(
@@ -250,7 +254,7 @@ function RunDemo(loadErrors, loadedShaders) {
   function OnTouchMove(e) {
     e.preventDefault();
 
-    if (e.touches.length === 1 && finishedZoom) {
+    if (isPanning && e.touches.length === 1) {
       // Handle panning (swiping)
       const touchX = e.touches[0].clientX;
       const touchY = e.touches[0].clientY;
@@ -275,9 +279,8 @@ function RunDemo(loadErrors, loadedShaders) {
 
       touchStartX = touchX;
       touchStartY = touchY;
-    } else if (e.touches.length === 2) {
+    } else if (isZooming && e.touches.length === 2) {
       // Handle zooming (pinching)
-      finishedZoom = false;
       const touch1 = e.touches[0];
       const touch2 = e.touches[1];
       const currentTouchDistance = Math.hypot(
@@ -288,7 +291,6 @@ function RunDemo(loadErrors, loadedShaders) {
       const pinchDelta = currentTouchDistance - previousTouchDistance;
       const zoomFactor = pinchDelta > 0 ? 0.99 : 1.01;
       velocityZoom = (zoomFactor - 1) * mobileZoomMomentumFactor;
-      currentTouches = e.touches.length;
 
       previousTouchDistance = currentTouchDistance;
     }
@@ -298,7 +300,8 @@ function RunDemo(loadErrors, loadedShaders) {
     e.preventDefault();
     // Reset touch variables if needed
     previousTouchDistance = 0;
-    if (currentTouches !== 2) finishedZoom = true;
+    isPanning = false;
+    isZooming = false;
   }
 
   // Modify the existing applyMomentum function to work with both mouse and touch inputs
@@ -311,16 +314,20 @@ function RunDemo(loadErrors, loadedShaders) {
       const iRange = maxI - minI;
       const rRange = maxR - minR;
 
-      minR -= velocityX * rRange;
-      maxR -= velocityX * rRange;
-      minI += velocityY * iRange;
-      maxI += velocityY * iRange;
+      if (Math.abs(velocityX) > 0.00001 || Math.abs(velocityY) > 0.00001) {
+        minR -= velocityX * rRange;
+        maxR -= velocityX * rRange;
+        minI += velocityY * iRange;
+        maxI += velocityY * iRange;
+      }
 
-      const zoomFactor = 1 + velocityZoom;
-      const newIRange = iRange * zoomFactor;
-      const deltaI = newIRange - iRange;
-      minI -= deltaI / 2;
-      maxI = minI + newIRange;
+      if (Math.abs(velocityZoom) > 0.00001) {
+        const zoomFactor = 1 + velocityZoom;
+        const newIRange = iRange * zoomFactor;
+        const deltaI = newIRange - iRange;
+        minI -= deltaI / 2;
+        maxI = minI + newIRange;
+      }
 
       OnResizeWindow();
 
