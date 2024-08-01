@@ -113,8 +113,8 @@ function RunDemo(loadErrors, loadedShaders) {
   let maxI = 2.0;
   let minR = -2.0;
   let maxR = 2.0;
-  let currentColorMode = 1; // ADJUSTABLE
-  let maxIterations = 10000; // ADJUSTABLE
+  let currentColorMode = 0; // ADJUSTABLE
+  let maxIterations = 3000; // ADJUSTABLE
 
   // Create buffers
   const vertexBuffer = gl.createBuffer();
@@ -218,6 +218,83 @@ function RunDemo(loadErrors, loadedShaders) {
     }
   }
 
+  // Touch control variables
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let previousTouchDistance = 0;
+
+  // Add touch event listeners
+  AddEvent(canvas, "touchstart", OnTouchStart);
+  AddEvent(canvas, "touchmove", OnTouchMove);
+  AddEvent(canvas, "touchend", OnTouchEnd);
+
+  function OnTouchStart(e) {
+    e.preventDefault();
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+
+    if (e.touches.length === 2) {
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      previousTouchDistance = Math.hypot(
+        touch1.clientX - touch2.clientX,
+        touch1.clientY - touch2.clientY
+      );
+    }
+  }
+
+  function OnTouchMove(e) {
+    e.preventDefault();
+
+    if (e.touches.length === 1) {
+      // Handle panning (swiping)
+      const touchX = e.touches[0].clientX;
+      const touchY = e.touches[0].clientY;
+
+      const movementX = touchX - touchStartX;
+      const movementY = touchY - touchStartY;
+
+      const iRange = maxI - minI;
+      const rRange = maxR - minR;
+      const currentZoom = getCurrentZoom();
+
+      velocityX =
+        (movementX / canvas.clientWidth) *
+        rRange *
+        moveMomentumFactor *
+        currentZoom;
+      velocityY =
+        (movementY / canvas.clientHeight) *
+        iRange *
+        moveMomentumFactor *
+        currentZoom;
+
+      touchStartX = touchX;
+      touchStartY = touchY;
+    } else if (e.touches.length === 2) {
+      // Handle zooming (pinching)
+      const touch1 = e.touches[0];
+      const touch2 = e.touches[1];
+      const currentTouchDistance = Math.hypot(
+        touch1.clientX - touch2.clientX,
+        touch1.clientY - touch2.clientY
+      );
+
+      const pinchDelta = currentTouchDistance - previousTouchDistance;
+      const zoomFactor = pinchDelta > 0 ? 0.99 : 1.01;
+      velocityZoom = (zoomFactor - 1) * zoomMomentumFactor;
+
+      previousTouchDistance = currentTouchDistance;
+    }
+  }
+
+  function OnTouchEnd(e) {
+    e.preventDefault();
+    // Reset touch variables if needed
+    previousTouchDistance = 0;
+  }
+
+  // Modify the existing applyMomentum function to work with both mouse and touch inputs
   function applyMomentum() {
     if (
       Math.abs(velocityX) > 0.00001 ||
