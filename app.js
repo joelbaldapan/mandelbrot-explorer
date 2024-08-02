@@ -109,10 +109,10 @@ function RunDemo(loadErrors, loadedShaders) {
 
   // Set CPU-side variables for all of our shader variables
   let vpDimensions = [canvas.clientWidth, canvas.clientHeight];
-  let minI = -2.0;
-  let maxI = 2.0;
-  let minR = -3.0;
-  let maxR = 2.0;
+  let minI = -1.5;
+  let maxI = 1.5;
+  let minR = -2.4;
+  let maxR = 1.5;
   let currentColorMode = 0; // ADJUSTABLE
   let maxIterations = 3000; // ADJUSTABLE
 
@@ -539,13 +539,18 @@ function RunDemo(loadErrors, loadedShaders) {
   settingsContainer.classList.toggle("hidden");
 
   hamburgerMenu.addEventListener("click", () => {
+    toggleHamburgerMenu();
+  });
+
+  function toggleHamburgerMenu() {
     hamburgerMenu.classList.toggle("change");
     settingsContainer.classList.toggle("hidden");
-  });
+  }
 
   // Color scheme selection
   const colorSchemeSelect = document.getElementById("color-scheme");
   colorSchemeSelect.addEventListener("change", function () {
+    toggleHamburgerMenu();
     switch (this.value) {
       case "cool-blue":
         currentColorMode = 0;
@@ -555,6 +560,21 @@ function RunDemo(loadErrors, loadedShaders) {
         break;
       case "black-and-white":
         currentColorMode = 2;
+        break;
+      case "cool-green":
+        currentColorMode = 3;
+        break;
+      case "gold":
+        currentColorMode = 4;
+        break;
+      case "plasma":
+        currentColorMode = 5;
+        break;
+      case "pastel":
+        currentColorMode = 6;
+        break;
+      case "inferno":
+        currentColorMode = 7;
         break;
       default:
         currentColorMode = 0;
@@ -579,6 +599,7 @@ function RunDemo(loadErrors, loadedShaders) {
   const jumpToSelect = document.getElementById("jump-to");
 
   jumpToSelect.addEventListener("change", function () {
+    toggleHamburgerMenu();
     let real, imaginary, zoom;
     switch (this.value) {
       case "home":
@@ -617,9 +638,9 @@ function RunDemo(loadErrors, loadedShaders) {
         zoom = 1300;
         break;
       case "vortex":
-        real = -0.7445146209;
-        imaginary = 0.0992383692;
-        zoom = 22000;
+        real = -0.7473319722;
+        imaginary = 0.1002953368;
+        zoom = 9046.45;
         break;
       case "portals":
         real = -0.0865673632;
