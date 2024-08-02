@@ -137,6 +137,9 @@ function RunDemo(loadErrors, loadedShaders) {
   const realInput = document.getElementById("real");
   const imaginaryInput = document.getElementById("imaginary");
   const zoomInput = document.getElementById("zoom");
+  let isEditingReal = false;
+  let isEditingImaginary = false;
+  let isEditingZoom = false;
 
   function maintainAspectRatio() {
     const aspectRatio = canvas.width / canvas.height;
@@ -161,14 +164,29 @@ function RunDemo(loadErrors, loadedShaders) {
 
   // Function to update input fields
   function updateInputFields() {
-    const centerR = (minR + maxR) / 2;
-    const centerI = (minI + maxI) / 2;
-    const currentZoom = 4 / (maxI - minI); // Assuming initial range is 4
-
-    realInput.value = centerR.toFixed(10);
-    imaginaryInput.value = centerI.toFixed(10);
-    zoomInput.value = currentZoom.toFixed(2);
+    if (!isEditingReal) {
+      const centerR = (minR + maxR) / 2;
+      realInput.value = centerR.toFixed(10);
+    }
+    if (!isEditingImaginary) {
+      const centerI = (minI + maxI) / 2;
+      imaginaryInput.value = centerI.toFixed(10);
+    }
+    if (!isEditingZoom) {
+      const currentZoom = 4 / (maxI - minI); // Assuming initial range is 4
+      zoomInput.value = currentZoom.toFixed(2);
+    }
   }
+
+  // Event listeners to the input fields to set and clear the editing flags
+  realInput.addEventListener("focus", () => (isEditingReal = true));
+  realInput.addEventListener("blur", () => (isEditingReal = false));
+
+  imaginaryInput.addEventListener("focus", () => (isEditingImaginary = true));
+  imaginaryInput.addEventListener("blur", () => (isEditingImaginary = false));
+
+  zoomInput.addEventListener("focus", () => (isEditingZoom = true));
+  zoomInput.addEventListener("blur", () => (isEditingZoom = false));
 
   // Function to update coordinates based on input
   function updateCoordinates() {
@@ -196,7 +214,9 @@ function RunDemo(loadErrors, loadedShaders) {
     velocityZoom = 0;
   }
 
-  // Add event listeners to input fields
+  /// Add this after getting the input elements:
+  const applyButton = document.getElementById("apply-coordinates");
+
   realInput.addEventListener("change", updateCoordinates);
   imaginaryInput.addEventListener("change", updateCoordinates);
   zoomInput.addEventListener("change", updateCoordinates);
