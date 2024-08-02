@@ -1,9 +1,16 @@
+:root {
+}
+
 html,
 body {
   width: 100%;
   height: 100%;
   margin: 0px;
   padding: 0px;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 #gl-surface {
@@ -15,18 +22,118 @@ body {
 #settings-container {
   z-index: 20;
   position: fixed;
+  padding: 1rem;
+  color: white;
 
-  background-color: aliceblue;
   top: 5vh;
   right: 5vh;
-  height: 90vh;
+}
+
+.setting {
+  margin-bottom: 1rem;
+}
+
+.setting h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.input-group h3 {
+  margin: 0;
+  flex: 0 0 40%;
+}
+
+.input-group input[type="number"],
+.input-group input[type="range"] {
+  flex: 0 0 55%;
+}
+
+.setting input[type="range"] {
+  width: 100%;
+}
+
+.setting input[type="number"],
+.setting select {
+  width: 100%;
+  padding: 0.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 4px;
+}
+
+.setting select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.7em top 50%;
+  background-size: 0.65em auto;
+}
+
+.setting select::-ms-expand {
+  display: none;
+}
+
+.setting select option {
+  background-color: #1a1a1a;
+  color: white;
+}
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.setting .iterations-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.setting .iterations-group input[type="range"] {
+  flex: 0 0 65%;
+  margin-right: 10px;
+}
+
+.setting .iterations-group input[type="number"] {
+  flex: 0 0 30%;
+  min-width: 60px;
+}
+
+/* Remove spinners for specific inputs */
+.no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield;
 }
 
 @media (max-width: 750px) {
   #settings-container {
-    background-color: aliceblue;
     top: 2vh;
     right: 2vh;
-    height: 30vh;
   }
+}
+
+.glass {
+  background: rgba(8, 8, 8, 0.44);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5.3px);
+  -webkit-backdrop-filter: blur(5.3px);
+  border: 1px solid rgba(31, 31, 31, 0.22);
 }

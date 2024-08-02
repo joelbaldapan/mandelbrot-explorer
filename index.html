@@ -10,7 +10,59 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body onload="Init();">
-    <div id="settings-container">Hello</div>
+    
+    <div id="settings-container" class="glass">
+      <div class="setting">
+        <h3>Iterations (Detail level)</h3>
+        <div class="iterations-group">
+          <input type="range" id="iterations" min="1" max="1500" value="100" />
+          <input
+            type="number"
+            id="iterations-value"
+            min="1"
+            max="1500"
+            value="100"
+          />
+        </div>
+      </div>
+      <div class="setting">
+        <div class="input-group">
+          <h3>Exponent</h3>
+          <input type="number" id="exponent" min="1" max="100" value="2" />
+        </div>
+      </div>
+      <div class="setting">
+        <h3>Color Scheme</h3>
+        <select id="color-scheme">
+          <option value="cool-blue">Cool Blue</option>
+          <option value="hot-pink">Hot Pink</option>
+          <option value="magma">Magma</option>
+        </select>
+      </div>
+
+      <div class="setting">
+        <div class="input-group">
+          <h3>Real:</h3>
+          <input type="number" id="real" step="any" class="no-spinner" />
+        </div>
+        <div class="input-group">
+          <h3>Imaginary:</h3>
+          <input type="number" id="imaginary" step="any" class="no-spinner" />
+        </div>
+        <div class="input-group">
+          <h3>Zoom:</h3>
+          <input type="number" id="zoom" step="any" />
+        </div>
+      </div>
+      <div class="setting">
+        <h3>Jump To...</h3>
+        <select id="jump-to">
+          <option value="home">Home</option>
+          <option value="seahorse-valley">Seahorse Valley</option>
+          <option value="starfish">Starfish</option>
+        </select>
+      </div>
+    </div>
     <canvas id="gl-surface"> HTML5 not supported. </canvas>
     <script src="./bower_components/async/dist/async.min.js"></script>
     <script src="app.js"></script>
