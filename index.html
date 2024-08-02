@@ -10,15 +10,14 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body onload="Init();">
-
     <div id="hamburger-menu">
       <div class="bar"></div>
       <div class="bar"></div>
       <div class="bar"></div>
     </div>
-    
+
     <div id="settings-container" class="glass">
-      <div class="setting">
+      <div class="setting-group">
         <h3>Iterations (Detail level)</h3>
         <div class="iterations-group">
           <input type="range" id="iterations" min="1" max="1500" value="100" />
@@ -30,14 +29,14 @@
             value="100"
           />
         </div>
-      </div>
-      <div class="setting">
+
         <div class="input-group">
           <h3>Exponent</h3>
           <input type="number" id="exponent" min="1" max="100" value="2" />
         </div>
       </div>
-      <div class="setting">
+
+      <div class="setting-group">
         <h3>Color Scheme</h3>
         <select id="color-scheme">
           <option value="cool-blue">Cool Blue</option>
@@ -46,11 +45,12 @@
         </select>
       </div>
 
-      <div class="setting">
+      <div class="setting-group">
         <div class="input-group">
           <h3>Real:</h3>
           <input type="number" id="real" step="any" class="no-spinner" />
         </div>
+
         <div class="input-group">
           <h3>Imaginary:</h3>
           <input type="number" id="imaginary" step="any" class="no-spinner" />
@@ -60,7 +60,8 @@
           <input type="number" id="zoom" step="any" />
         </div>
       </div>
-      <div class="setting">
+
+      <div class="setting-group">
         <h3>Jump To...</h3>
         <select id="jump-to">
           <option value="home">Home</option>

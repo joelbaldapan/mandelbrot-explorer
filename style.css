@@ -11,6 +11,8 @@ body {
 
 * {
   box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
 }
 
 #gl-surface {
@@ -20,7 +22,7 @@ body {
   cursor: grab;
 }
 
-/* Settings */
+/* setting-groups */
 
 #settings-container {
   z-index: 20;
@@ -28,24 +30,30 @@ body {
   padding: 2rem;
   color: white;
 
+  display: flex;
+  flex-direction: column;
+
   top: 5vh;
   right: 5vh;
 }
 
-.setting {
+.setting-group {
   margin-top: 1rem;
 }
 
-.setting h3 {
-  margin-bottom: 0.5rem;
+.setting-group h3 {
   font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.input-group {
+  margin-bottom: 0.5rem;
 }
 
 .input-group {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.5rem;
 }
 
 .input-group h3 {
@@ -58,12 +66,12 @@ body {
   flex: 0 0 55%;
 }
 
-.setting input[type="range"] {
+.setting-group input[type="range"] {
   width: 100%;
 }
 
-.setting input[type="number"],
-.setting select {
+.setting-group input[type="number"],
+.setting-group select {
   width: 100%;
   padding: 0.25rem;
   background: rgba(255, 255, 255, 0.1);
@@ -72,7 +80,7 @@ body {
   border-radius: 4px;
 }
 
-.setting select {
+.setting-group select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -82,11 +90,11 @@ body {
   background-size: 0.65em auto;
 }
 
-.setting select::-ms-expand {
+.setting-group select::-ms-expand {
   display: none;
 }
 
-.setting select option {
+.setting-group select option {
   background-color: #1a1a1a;
   color: white;
 }
@@ -97,19 +105,19 @@ body {
   margin: 0;
 }
 
-.setting .iterations-group {
+.setting-group .iterations-group {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.5rem;
 }
 
-.setting .iterations-group input[type="range"] {
+.setting-group .iterations-group input[type="range"] {
   flex: 0 0 65%;
   margin-right: 10px;
 }
 
-.setting .iterations-group input[type="number"] {
+.setting-group .iterations-group input[type="number"] {
   flex: 0 0 30%;
   min-width: 60px;
 }
@@ -147,7 +155,7 @@ body {
   transition: 0.4s;
 }
 
-.hidden {
+#settings-container.hidden {
   display: none;
 }
 

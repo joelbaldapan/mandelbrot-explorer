@@ -205,7 +205,7 @@ function RunDemo(loadErrors, loadedShaders) {
 
   function updateCursor(isGrabbing) {
     if (!isOverSettings) {
-      canvas.style.cursor = isGrabbing ? 'grabbing' : 'grab';
+      canvas.style.cursor = isGrabbing ? "grabbing" : "grab";
     }
   }
 
