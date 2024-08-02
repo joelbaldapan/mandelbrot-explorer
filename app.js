@@ -133,6 +133,74 @@ function RunDemo(loadErrors, loadedShaders) {
   );
   gl.enableVertexAttribArray(vPosAttrib);
 
+  // Get input elements
+  const realInput = document.getElementById("real");
+  const imaginaryInput = document.getElementById("imaginary");
+  const zoomInput = document.getElementById("zoom");
+
+  function maintainAspectRatio() {
+    const aspectRatio = canvas.width / canvas.height;
+    const currentWidth = maxR - minR;
+    const currentHeight = maxI - minI;
+    const currentAspectRatio = currentWidth / currentHeight;
+
+    if (currentAspectRatio > aspectRatio) {
+      // Current view is too wide, adjust height
+      const targetHeight = currentWidth / aspectRatio;
+      const deltaHeight = targetHeight - currentHeight;
+      minI -= deltaHeight / 2;
+      maxI += deltaHeight / 2;
+    } else {
+      // Current view is too tall, adjust width
+      const targetWidth = currentHeight * aspectRatio;
+      const deltaWidth = targetWidth - currentWidth;
+      minR -= deltaWidth / 2;
+      maxR += deltaWidth / 2;
+    }
+  }
+
+  // Function to update input fields
+  function updateInputFields() {
+    const centerR = (minR + maxR) / 2;
+    const centerI = (minI + maxI) / 2;
+    const currentZoom = 4 / (maxI - minI); // Assuming initial range is 4
+
+    realInput.value = centerR.toFixed(10);
+    imaginaryInput.value = centerI.toFixed(10);
+    zoomInput.value = currentZoom.toFixed(2);
+  }
+
+  // Function to update coordinates based on input
+  function updateCoordinates() {
+    const real = parseFloat(realInput.value);
+    const imaginary = parseFloat(imaginaryInput.value);
+    const zoom = parseFloat(zoomInput.value);
+
+    const width = 4 / zoom;
+    const height = width * (vpDimensions[1] / vpDimensions[0]);
+
+    minR = real - width / 2;
+    maxR = real + width / 2;
+    minI = imaginary - height / 2;
+    maxI = imaginary + height / 2;
+
+    // Update uniforms
+    gl.uniform1f(uniforms.minI, minI);
+    gl.uniform1f(uniforms.maxI, maxI);
+    gl.uniform1f(uniforms.minR, minR);
+    gl.uniform1f(uniforms.maxR, maxR);
+
+    // Reset velocities when manually updating coordinates
+    velocityX = 0;
+    velocityY = 0;
+    velocityZoom = 0;
+  }
+
+  // Add event listeners to input fields
+  realInput.addEventListener("change", updateCoordinates);
+  imaginaryInput.addEventListener("change", updateCoordinates);
+  zoomInput.addEventListener("change", updateCoordinates);
+
   const loop = function () {
     // Draw
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -148,6 +216,9 @@ function RunDemo(loadErrors, loadedShaders) {
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
 
+    // Update input fields with current values
+    updateInputFields();
+
     applyMomentum();
 
     requestAnimationFrame(loop);
@@ -155,10 +226,6 @@ function RunDemo(loadErrors, loadedShaders) {
   requestAnimationFrame(loop);
 
   OnResizeWindow();
-
-  //
-  // Event Listeners
-  //
 
   // Add cursor updaters
   const settingsContainer = document.getElementById("settings-container");
@@ -203,16 +270,24 @@ function RunDemo(loadErrors, loadedShaders) {
     return 4 / (maxI - minI); // Range is -2 to 2 (total of 4)
   }
 
-  function updateCursor(isGrabbing) {
-    if (!isOverSettings) {
-      canvas.style.cursor = isGrabbing ? "grabbing" : "grab";
-    }
-  }
-
   function OnZoom(e) {
     if (!isOverSettings) {
       const zoomFactor = e.deltaY < 0 ? 0.95 : 1.05;
       velocityZoom = (zoomFactor - 1) * zoomMomentumFactor;
+
+      // Apply zoom immediately for smoother input field updates
+      const iRange = maxI - minI;
+      const rRange = maxR - minR;
+      const centerI = (maxI + minI) / 2;
+      const centerR = (maxR + minR) / 2;
+
+      minI = centerI - (iRange * zoomFactor) / 2;
+      maxI = centerI + (iRange * zoomFactor) / 2;
+      minR = centerR - (rRange * zoomFactor) / 2;
+      maxR = centerR + (rRange * zoomFactor) / 2;
+
+      // Update input fields
+      updateInputFields();
     }
   }
 
@@ -232,6 +307,15 @@ function RunDemo(loadErrors, loadedShaders) {
         iRange *
         moveMomentumFactor *
         currentZoom;
+
+      // Update coordinates immediately for smoother input field updates
+      minR -= velocityX * rRange;
+      maxR -= velocityX * rRange;
+      minI += velocityY * iRange;
+      maxI += velocityY * iRange;
+
+      // Update input fields
+      updateInputFields();
     }
   }
 
@@ -296,6 +380,15 @@ function RunDemo(loadErrors, loadedShaders) {
 
       touchStartX = touchX;
       touchStartY = touchY;
+
+      // Update coordinates immediately for smoother input field updates
+      minR -= velocityX * rRange;
+      maxR -= velocityX * rRange;
+      minI += velocityY * iRange;
+      maxI += velocityY * iRange;
+
+      // Update input fields
+      updateInputFields();
     } else if (isZooming && e.touches.length === 2) {
       // Handle zooming (pinching)
       const touch1 = e.touches[0];
@@ -310,6 +403,20 @@ function RunDemo(loadErrors, loadedShaders) {
       velocityZoom = (zoomFactor - 1) * mobileZoomMomentumFactor;
 
       previousTouchDistance = currentTouchDistance;
+
+      // Apply zoom immediately for smoother input field updates
+      const iRange = maxI - minI;
+      const rRange = maxR - minR;
+      const centerI = (maxI + minI) / 2;
+      const centerR = (maxR + minR) / 2;
+
+      minI = centerI - (iRange * zoomFactor) / 2;
+      maxI = centerI + (iRange * zoomFactor) / 2;
+      minR = centerR - (rRange * zoomFactor) / 2;
+      maxR = centerR + (rRange * zoomFactor) / 2;
+
+      // Update input fields
+      updateInputFields();
     }
   }
 
@@ -329,7 +436,6 @@ function RunDemo(loadErrors, loadedShaders) {
     }
   }
 
-  // Modify the existing applyMomentum function to work with both mouse and touch inputs
   function applyMomentum() {
     if (
       Math.abs(velocityX) > 0.00001 ||
@@ -359,6 +465,9 @@ function RunDemo(loadErrors, loadedShaders) {
       velocityX *= friction;
       velocityY *= friction;
       velocityZoom *= friction;
+
+      // Update input fields after applying momentum
+      updateInputFields();
     }
   }
 
@@ -385,14 +494,85 @@ function RunDemo(loadErrors, loadedShaders) {
       minR;
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+
+    // Update input fields after resizing
+    updateInputFields();
   }
 
   // Hamburger Menu
   const hamburgerMenu = document.getElementById("hamburger-menu");
-  hamburgerMenu.classList.toggle("change");
+  settingsContainer.classList.toggle("hidden");
 
   hamburgerMenu.addEventListener("click", () => {
     hamburgerMenu.classList.toggle("change");
     settingsContainer.classList.toggle("hidden");
   });
+
+  // Color scheme selection
+  const colorSchemeSelect = document.getElementById("color-scheme");
+  colorSchemeSelect.addEventListener("change", function () {
+    switch (this.value) {
+      case "cool-blue":
+        currentColorMode = 0;
+        break;
+      case "hot-pink":
+        currentColorMode = 1;
+        break;
+      case "magma":
+        currentColorMode = 2;
+        break;
+      default:
+        currentColorMode = 0;
+    }
+  });
+
+  // Iterations slider and input
+  const iterationsSlider = document.getElementById("iterations");
+  const iterationsValue = document.getElementById("iterations-value");
+
+  iterationsSlider.addEventListener("input", function () {
+    iterationsValue.value = this.value;
+    maxIterations = parseInt(this.value);
+  });
+
+  iterationsValue.addEventListener("change", function () {
+    iterationsSlider.value = this.value;
+    maxIterations = parseInt(this.value);
+  });
+
+  // Jump to location
+  const jumpToSelect = document.getElementById("jump-to");
+  jumpToSelect.addEventListener("change", function () {
+    switch (this.value) {
+      case "home":
+        minR = -2.0;
+        maxR = 1.0;
+        minI = -1.5;
+        maxI = 1.5;
+        break;
+      case "seahorse-valley":
+        minR = -0.8;
+        maxR = -0.7;
+        minI = 0.05;
+        maxI = 0.15;
+        break;
+      case "starfish":
+        minR = -0.463;
+        maxR = -0.413;
+        minI = 0.56;
+        maxI = 0.61;
+        break;
+    }
+    maintainAspectRatio();
+    updateInputFields();
+
+    velocityZoom = 0.005;
+    gl.uniform1f(uniforms.minI, minI);
+    gl.uniform1f(uniforms.maxI, maxI);
+    gl.uniform1f(uniforms.minR, minR);
+    gl.uniform1f(uniforms.maxR, maxR);
+  });
+
+  // Initial update of input fields
+  updateInputFields();
 }
