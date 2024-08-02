@@ -356,8 +356,8 @@ function RunDemo(loadErrors, loadedShaders) {
   let touchStartX = 0;
   let touchStartY = 0;
   let previousTouchDistance = 0;
-  const mobileZoomMomentumFactor = 4;
-  const mobileMoveMomentumFactor = 0.1;
+  const mobileZoomMomentumFactor = 3;
+  const mobileMoveMomentumFactor = 0.18;
   let isPanning = false;
   let isZooming = false;
 
@@ -619,7 +619,7 @@ function RunDemo(loadErrors, loadedShaders) {
       case "vortex":
         real = -0.7445146209;
         imaginary = 0.0992383692;
-        zoom = 2200;
+        zoom = 22000;
         break;
       case "portals":
         real = -0.0865673632;
