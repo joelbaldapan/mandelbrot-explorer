@@ -111,7 +111,7 @@ function RunDemo(loadErrors, loadedShaders) {
   let vpDimensions = [canvas.clientWidth, canvas.clientHeight];
   let minI = -2.0;
   let maxI = 2.0;
-  let minR = -2.0;
+  let minR = -3.0;
   let maxR = 2.0;
   let currentColorMode = 0; // ADJUSTABLE
   let maxIterations = 3000; // ADJUSTABLE
@@ -133,28 +133,7 @@ function RunDemo(loadErrors, loadedShaders) {
   );
   gl.enableVertexAttribArray(vPosAttrib);
 
-  let thisframetime;
-  let lastframetime = performance.now();
-  let dt;
-  let frames = [];
-  let lastPrintTime = performance.now();
   const loop = function () {
-    // FPS information
-    thisframetime = performance.now();
-    dt = thisframetime - lastframetime;
-    lastframetime = thisframetime;
-    frames.push(dt);
-    if (lastPrintTime + 750 < thisframetime) {
-      lastPrintTime = thisframetime;
-      var average = 0;
-      for (var i = 0; i < frames.length; i++) {
-        average += frames[i];
-      }
-      average /= frames.length;
-      document.title = Math.round(1000 / average) + " fps";
-    }
-    frames = frames.slice(0, 250);
-
     // Draw
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
@@ -223,7 +202,7 @@ function RunDemo(loadErrors, loadedShaders) {
   let touchStartY = 0;
   let previousTouchDistance = 0;
   const mobileZoomMomentumFactor = 4;
-  const mobileMoveMomentumFactor = 0.25;
+  const mobileMoveMomentumFactor = 0.4;
   let isPanning = false;
   let isZooming = false;
 

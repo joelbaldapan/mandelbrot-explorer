@@ -1,0 +1,32 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+}
+
+#gl-surface {
+  margin: 0px;
+  padding: 0px;
+  position: absolute;
+}
+
+#settings-container {
+  z-index: 20;
+  position: fixed;
+
+  background-color: aliceblue;
+  top: 5vh;
+  right: 5vh;
+  height: 90vh;
+}
+
+@media (max-width: 750px) {
+  #settings-container {
+    background-color: aliceblue;
+    top: 2vh;
+    right: 2vh;
+    height: 30vh;
+  }
+}
