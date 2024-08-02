@@ -173,7 +173,7 @@ function RunDemo(loadErrors, loadedShaders) {
       imaginaryInput.value = centerI.toFixed(10);
     }
     if (!isEditingZoom) {
-      const currentZoom = 4 / (maxI - minI); // Assuming initial range is 4
+      const currentZoom = getCurrentZoom();
       zoomInput.value = currentZoom.toFixed(2);
     }
   }
@@ -194,8 +194,14 @@ function RunDemo(loadErrors, loadedShaders) {
     const imaginary = parseFloat(imaginaryInput.value);
     const zoom = parseFloat(zoomInput.value);
 
+    if (isNaN(real) || isNaN(imaginary) || isNaN(zoom)) {
+      alert("Please enter valid numbers for all fields.");
+      return;
+    }
+
+    const aspectRatio = canvas.width / canvas.height;
     const width = 4 / zoom;
-    const height = width * (vpDimensions[1] / vpDimensions[0]);
+    const height = width / aspectRatio;
 
     minR = real - width / 2;
     maxR = real + width / 2;
@@ -212,6 +218,9 @@ function RunDemo(loadErrors, loadedShaders) {
     velocityX = 0;
     velocityY = 0;
     velocityZoom = 0;
+
+    // Update input fields
+    updateInputFields();
   }
 
   /// Add this after getting the input elements:
@@ -287,7 +296,7 @@ function RunDemo(loadErrors, loadedShaders) {
   const moveMomentumFactor = 0.07;
 
   function getCurrentZoom() {
-    return 4 / (maxI - minI); // Range is -2 to 2 (total of 4)
+    return 4 / Math.max(maxR - minR, maxI - minI);
   }
 
   function OnZoom(e) {
@@ -464,6 +473,8 @@ function RunDemo(loadErrors, loadedShaders) {
     ) {
       const iRange = maxI - minI;
       const rRange = maxR - minR;
+      const centerI = (maxI + minI) / 2;
+      const centerR = (maxR + minR) / 2;
 
       if (Math.abs(velocityX) > 0.00001 || Math.abs(velocityY) > 0.00001) {
         minR -= velocityX * rRange;
@@ -474,13 +485,16 @@ function RunDemo(loadErrors, loadedShaders) {
 
       if (Math.abs(velocityZoom) > 0.00001) {
         const zoomFactor = 1 + velocityZoom;
-        const newIRange = iRange * zoomFactor;
-        const deltaI = newIRange - iRange;
-        minI -= deltaI / 2;
-        maxI = minI + newIRange;
+        minI = centerI - (iRange * zoomFactor) / 2;
+        maxI = centerI + (iRange * zoomFactor) / 2;
+        minR = centerR - (rRange * zoomFactor) / 2;
+        maxR = centerR + (rRange * zoomFactor) / 2;
       }
 
-      OnResizeWindow();
+      gl.uniform1f(uniforms.minI, minI);
+      gl.uniform1f(uniforms.maxI, maxI);
+      gl.uniform1f(uniforms.minR, minR);
+      gl.uniform1f(uniforms.maxR, maxR);
 
       velocityX *= friction;
       velocityY *= friction;
@@ -498,20 +512,22 @@ function RunDemo(loadErrors, loadedShaders) {
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    const stretch = 0.9;
 
     vpDimensions = [canvas.clientWidth, canvas.clientHeight];
 
-    const oldRealRange = maxR - minR;
-    maxR =
-      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
-      minR;
-    const newRealRange = maxR - minR;
+    const aspectRatio = canvas.width / canvas.height;
+    const currentWidth = maxR - minR;
+    const currentHeight = maxI - minI;
+    const centerR = (minR + maxR) / 2;
+    const centerI = (minI + maxI) / 2;
 
-    minR -= (newRealRange - oldRealRange) / 2;
-    maxR =
-      ((maxI - minI) * (canvas.clientWidth / canvas.clientHeight)) / stretch +
-      minR;
+    const newWidth = Math.max(currentWidth, currentHeight * aspectRatio);
+    const newHeight = newWidth / aspectRatio;
+
+    minR = centerR - newWidth / 2;
+    maxR = centerR + newWidth / 2;
+    minI = centerI - newHeight / 2;
+    maxI = centerI + newHeight / 2;
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
