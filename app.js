@@ -178,15 +178,7 @@ function RunDemo(loadErrors, loadedShaders) {
     }
   }
 
-  // Download image
-  let pngDataUrl;
-  const downloadBtn = document.getElementById("download-btn");
-  const downloadLink = document.getElementById("canvas-download-link")
-  downloadBtn.addEventListener("click", () => {
-    downloadLink.href = pngDataUrl;
-    downloadLink.download = "mandelbrot.png"; // The filename for the download
-    downloadLink.click();
-  });
+  let zoomLevel = 1;
 
   // Event listeners to the input fields to set and clear the editing flags
   realInput.addEventListener("focus", () => (isEditingReal = true));
@@ -209,10 +201,11 @@ function RunDemo(loadErrors, loadedShaders) {
       return;
     }
 
-    // Use the zoom to calculate the height of the view
-    const height = 4 / zoom;
+    zoomLevel = zoom;
 
-    // Calculate the width based on the aspect ratio
+    // Calculate the view dimensions based on the zoom level
+    const baseHeight = 3; // This determines the initial view height
+    const height = baseHeight / zoomLevel;
     const aspectRatio = canvas.width / canvas.height;
     const width = height * aspectRatio;
 
@@ -231,6 +224,10 @@ function RunDemo(loadErrors, loadedShaders) {
     // Update input fields
     updateInputFields();
   }
+
+  realInput.addEventListener("change", updateCoordinates);
+  imaginaryInput.addEventListener("change", updateCoordinates);
+  zoomInput.addEventListener("change", updateCoordinates);
 
   const loop = function () {
     // Draw
@@ -252,11 +249,22 @@ function RunDemo(loadErrors, loadedShaders) {
     updateInputFields();
 
     applyMomentum();
+
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
 
   OnResizeWindow();
+
+  // Download image
+  let pngDataUrl;
+  const downloadBtn = document.getElementById("download-btn");
+  const downloadLink = document.getElementById("canvas-download-link");
+  downloadBtn.addEventListener("click", () => {
+    downloadLink.href = pngDataUrl;
+    downloadLink.download = "mandelbrot.png"; // The filename for the download
+    downloadLink.click();
+  });
 
   // Add cursor updaters
   const settingsContainer = document.getElementById("settings-container");
@@ -298,24 +306,19 @@ function RunDemo(loadErrors, loadedShaders) {
   const moveMomentumFactor = 0.1;
 
   function getCurrentZoom() {
-    return 4 / Math.max(maxR - minR, maxI - minI);
+    return zoomLevel;
   }
 
   function OnZoom(e) {
     if (!isOverSettings) {
-      const zoomFactor = e.deltaY < 0 ? 0.95 : 1.05;
+      const zoomFactor = e.deltaY < 0 ? 1.05 : 0.95;
+      zoomLevel *= zoomFactor;
       velocityZoom = (zoomFactor - 1) * zoomMomentumFactor;
 
-      // Apply zoom immediately for smoother input field updates
-      const iRange = maxI - minI;
-      const rRange = maxR - minR;
+      // Update coordinates based on new zoom level
       const centerI = (maxI + minI) / 2;
       const centerR = (maxR + minR) / 2;
-
-      minI = centerI - (iRange * zoomFactor) / 2;
-      maxI = centerI + (iRange * zoomFactor) / 2;
-      minR = centerR - (rRange * zoomFactor) / 2;
-      maxR = centerR + (rRange * zoomFactor) / 2;
+      updateCoordinates();
 
       // Update input fields
       updateInputFields();
@@ -473,37 +476,30 @@ function RunDemo(loadErrors, loadedShaders) {
       Math.abs(velocityY) > 0.00001 ||
       Math.abs(velocityZoom) > 0.00001
     ) {
-      const iRange = maxI - minI;
-      const rRange = maxR - minR;
       const centerI = (maxI + minI) / 2;
       const centerR = (maxR + minR) / 2;
 
       if (Math.abs(velocityX) > 0.00001 || Math.abs(velocityY) > 0.00001) {
-        minR -= velocityX * rRange;
-        maxR -= velocityX * rRange;
-        minI += velocityY * iRange;
-        maxI += velocityY * iRange;
+        const iRange = maxI - minI;
+        const rRange = maxR - minR;
+
+        const newCenterR = centerR - velocityX * rRange;
+        const newCenterI = centerI + velocityY * iRange;
+
+        realInput.value = newCenterR.toFixed(10);
+        imaginaryInput.value = newCenterI.toFixed(10);
       }
 
       if (Math.abs(velocityZoom) > 0.00001) {
-        const zoomFactor = 1 + velocityZoom;
-        minI = centerI - (iRange * zoomFactor) / 2;
-        maxI = centerI + (iRange * zoomFactor) / 2;
-        minR = centerR - (rRange * zoomFactor) / 2;
-        maxR = centerR + (rRange * zoomFactor) / 2;
+        zoomLevel *= 1 + velocityZoom;
+        zoomInput.value = zoomLevel.toFixed(2);
       }
 
-      gl.uniform1f(uniforms.minI, minI);
-      gl.uniform1f(uniforms.maxI, maxI);
-      gl.uniform1f(uniforms.minR, minR);
-      gl.uniform1f(uniforms.maxR, maxR);
+      updateCoordinates();
 
       velocityX *= friction;
       velocityY *= friction;
       velocityZoom *= friction;
-
-      // Update input fields after applying momentum
-      updateInputFields();
     }
   }
 
@@ -673,7 +669,7 @@ function RunDemo(loadErrors, loadedShaders) {
     // Reset velocities
     velocityX = 0;
     velocityY = 0;
-    velocityZoom = 0.01;
+    velocityZoom = -0.01;
   });
 
   // Initial update of input fields
