@@ -585,17 +585,42 @@ function RunDemo(loadErrors, loadedShaders) {
       case "home":
         real = -0.5;
         imaginary = 0;
-        zoom = 0.8;
+        zoom = 0.6;
+        break;
+      case "flower":
+        real = -1.9854;
+        imaginary = 0;
+        zoom = 1323;
         break;
       case "seahorse-valley":
-        real = -0.75;
-        imaginary = 0.1;
-        zoom = 40;
+        real = -0.729;
+        imaginary = 0.186;
+        zoom = 80;
         break;
       case "starfish":
         real = -0.417;
-        imaginary = 0.603;
+        imaginary = -0.603;
         zoom = 130;
+        break;
+      case "elephant-valley":
+        real = 0.3;
+        imaginary = 0.485;
+        zoom = 200;
+        break;
+      case "vortex":
+        real = -0.7445146209;
+        imaginary = 0.0992383692;
+        zoom = 17600;
+        break;
+      case "portals":
+        real = -0.0865673632;
+        imaginary = -0.6563693169;
+        zoom = 340.0;
+        break;
+      case "sun":
+        real = -0.776592847;
+        imaginary = -0.136640848;
+        zoom = 13700.0;
         break;
     }
 
