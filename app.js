@@ -199,10 +199,14 @@ function RunDemo(loadErrors, loadedShaders) {
       return;
     }
 
-    const aspectRatio = canvas.width / canvas.height;
-    const width = 4 / zoom;
-    const height = width / aspectRatio;
+    // Use the zoom to calculate the height of the view
+    const height = 4 / zoom;
 
+    // Calculate the width based on the aspect ratio
+    const aspectRatio = canvas.width / canvas.height;
+    const width = height * aspectRatio;
+
+    // Calculate the bounds
     minR = real - width / 2;
     maxR = real + width / 2;
     minI = imaginary - height / 2;
@@ -213,11 +217,6 @@ function RunDemo(loadErrors, loadedShaders) {
     gl.uniform1f(uniforms.maxI, maxI);
     gl.uniform1f(uniforms.minR, minR);
     gl.uniform1f(uniforms.maxR, maxR);
-
-    // Reset velocities when manually updating coordinates
-    velocityX = 0;
-    velocityY = 0;
-    velocityZoom = 0;
 
     // Update input fields
     updateInputFields();
@@ -554,7 +553,7 @@ function RunDemo(loadErrors, loadedShaders) {
       case "hot-pink":
         currentColorMode = 1;
         break;
-      case "magma":
+      case "black-and-white":
         currentColorMode = 2;
         break;
       default:
@@ -585,42 +584,57 @@ function RunDemo(loadErrors, loadedShaders) {
       case "home":
         real = -0.5;
         imaginary = 0;
-        zoom = 0.6;
+        zoom = 1.5;
         break;
       case "flower":
         real = -1.9854;
         imaginary = 0;
-        zoom = 1323;
+        zoom = 2200;
         break;
       case "seahorse-valley":
-        real = -0.729;
-        imaginary = 0.186;
-        zoom = 80;
+        real = -0.737532251;
+        imaginary = 0.1665403958;
+        zoom = 220.89;
         break;
       case "starfish":
         real = -0.417;
         imaginary = -0.603;
-        zoom = 130;
+        zoom = 370;
         break;
       case "elephant-valley":
-        real = 0.3;
-        imaginary = 0.485;
-        zoom = 200;
+        real = 0.2965505633;
+        imaginary = 0.4849154776;
+        zoom = 391.78;
+        break;
+      case "spiral":
+        real = -0.764140113;
+        imaginary = -0.09488865;
+        zoom = 3500.72;
+        break;
+      case "lightning-storm":
+        real = -1.7754446326;
+        imaginary = -0.0046148166;
+        zoom = 1300;
         break;
       case "vortex":
         real = -0.7445146209;
         imaginary = 0.0992383692;
-        zoom = 17600;
+        zoom = 2200;
         break;
       case "portals":
         real = -0.0865673632;
         imaginary = -0.6563693169;
-        zoom = 340.0;
+        zoom = 1300.47;
         break;
       case "sun":
         real = -0.776592847;
         imaginary = -0.136640848;
-        zoom = 13700.0;
+        zoom = 20000.0;
+        break;
+      case "tendrils":
+        real = -0.2175216301;
+        imaginary = -1.1144508288;
+        zoom = 9000.0;
         break;
     }
 

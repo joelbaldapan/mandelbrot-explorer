@@ -16,7 +16,7 @@ vec3 hsbToRgb(vec3 c) {
 vec3 calculateColor0(float iterations, float maxIterations) {
     float hue = 200.0 + mod(sqrt(iterations / 50.0) * 1.0, 255.0);
     float sat = 80.0 / 100.0;
-    float bri = 10.0 + sqrt(iterations / 90.0) * 80.0;
+    float bri = 10.0 + sqrt(iterations / 100.0) * 70.0;
     bri = bri / 100.0;
     return hsbToRgb(vec3(hue / 360.0, sat, bri));
 }
