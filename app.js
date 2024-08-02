@@ -160,6 +160,36 @@ function RunDemo(loadErrors, loadedShaders) {
   // Event Listeners
   //
 
+  // Add cursor updaters
+  const settingsContainer = document.getElementById("settings-container");
+  let isOverSettings = false;
+  AddEvent(canvas, "mousedown", () => updateCursor(true));
+  AddEvent(canvas, "mouseup", () => updateCursor(false));
+  AddEvent(canvas, "mouseleave", () => updateCursor(false));
+
+  function updateCursor(isGrabbing) {
+    if (isGrabbing) {
+      canvas.style.cursor = "grabbing";
+    } else {
+      canvas.style.cursor = "grab";
+    }
+  }
+
+  // Add event listeners for settings container
+  AddEvent(settingsContainer, "mouseenter", () => {
+    isOverSettings = true;
+    canvas.style.cursor = "default";
+  });
+  AddEvent(settingsContainer, "mouseleave", () => {
+    isOverSettings = false;
+    updateCursor(false);
+  });
+
+  // Add mouse listeners
+  AddEvent(window, "resize", OnResizeWindow);
+  AddEvent(canvas, "wheel", OnZoom);
+  AddEvent(canvas, "mousemove", OnMouseMove);
+
   // Momentum variables
   let velocityX = 0;
   let velocityY = 0;
@@ -169,17 +199,25 @@ function RunDemo(loadErrors, loadedShaders) {
   const zoomMomentumFactor = 0.6;
   const moveMomentumFactor = 0.07;
 
-  function OnZoom(e) {
-    const zoomFactor = e.deltaY < 0 ? 0.95 : 1.05;
-    velocityZoom = (zoomFactor - 1) * zoomMomentumFactor;
-  }
-
   function getCurrentZoom() {
     return 4 / (maxI - minI); // Range is -2 to 2 (total of 4)
   }
 
+  function updateCursor(isGrabbing) {
+    if (!isOverSettings) {
+      canvas.style.cursor = isGrabbing ? 'grabbing' : 'grab';
+    }
+  }
+
+  function OnZoom(e) {
+    if (!isOverSettings) {
+      const zoomFactor = e.deltaY < 0 ? 0.95 : 1.05;
+      velocityZoom = (zoomFactor - 1) * zoomMomentumFactor;
+    }
+  }
+
   function OnMouseMove(e) {
-    if (e.buttons === 1) {
+    if (!isOverSettings && e.buttons === 1) {
       const iRange = maxI - minI;
       const rRange = maxR - minR;
       const currentZoom = getCurrentZoom();
@@ -197,6 +235,11 @@ function RunDemo(loadErrors, loadedShaders) {
     }
   }
 
+  // Add touch event listeners
+  AddEvent(canvas, "touchstart", OnTouchStart);
+  AddEvent(canvas, "touchmove", OnTouchMove);
+  AddEvent(canvas, "touchend", OnTouchEnd);
+
   // Touch control variables
   let touchStartX = 0;
   let touchStartY = 0;
@@ -205,11 +248,6 @@ function RunDemo(loadErrors, loadedShaders) {
   const mobileMoveMomentumFactor = 0.4;
   let isPanning = false;
   let isZooming = false;
-
-  // Add touch event listeners
-  AddEvent(canvas, "touchstart", OnTouchStart);
-  AddEvent(canvas, "touchmove", OnTouchMove);
-  AddEvent(canvas, "touchend", OnTouchEnd);
 
   function OnTouchStart(e) {
     e.preventDefault();
@@ -351,7 +389,6 @@ function RunDemo(loadErrors, loadedShaders) {
 
   // Hamburger Menu
   const hamburgerMenu = document.getElementById("hamburger-menu");
-  const settingsContainer = document.getElementById("settings-container");
   hamburgerMenu.classList.toggle("change");
 
   hamburgerMenu.addEventListener("click", () => {
