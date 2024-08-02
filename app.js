@@ -293,7 +293,7 @@ function RunDemo(loadErrors, loadedShaders) {
   const friction = 0.9;
 
   const zoomMomentumFactor = 0.6;
-  const moveMomentumFactor = 0.07;
+  const moveMomentumFactor = 0.1;
 
   function getCurrentZoom() {
     return 4 / Math.max(maxR - minR, maxI - minI);
@@ -358,7 +358,7 @@ function RunDemo(loadErrors, loadedShaders) {
   let touchStartY = 0;
   let previousTouchDistance = 0;
   const mobileZoomMomentumFactor = 4;
-  const mobileMoveMomentumFactor = 0.4;
+  const mobileMoveMomentumFactor = 0.1;
   let isPanning = false;
   let isZooming = false;
 
@@ -578,35 +578,39 @@ function RunDemo(loadErrors, loadedShaders) {
 
   // Jump to location
   const jumpToSelect = document.getElementById("jump-to");
+
   jumpToSelect.addEventListener("change", function () {
+    let real, imaginary, zoom;
     switch (this.value) {
       case "home":
-        minR = -2.0;
-        maxR = 1.0;
-        minI = -1.5;
-        maxI = 1.5;
+        real = -0.5;
+        imaginary = 0;
+        zoom = 0.8;
         break;
       case "seahorse-valley":
-        minR = -0.8;
-        maxR = -0.7;
-        minI = 0.05;
-        maxI = 0.15;
+        real = -0.75;
+        imaginary = 0.1;
+        zoom = 40;
         break;
       case "starfish":
-        minR = -0.463;
-        maxR = -0.413;
-        minI = 0.56;
-        maxI = 0.61;
+        real = -0.417;
+        imaginary = 0.603;
+        zoom = 130;
         break;
     }
-    maintainAspectRatio();
-    updateInputFields();
 
-    velocityZoom = 0.005;
-    gl.uniform1f(uniforms.minI, minI);
-    gl.uniform1f(uniforms.maxI, maxI);
-    gl.uniform1f(uniforms.minR, minR);
-    gl.uniform1f(uniforms.maxR, maxR);
+    // Update input fields
+    realInput.value = real.toFixed(10);
+    imaginaryInput.value = imaginary.toFixed(10);
+    zoomInput.value = zoom.toFixed(2);
+
+    // Call updateCoordinates to apply the new values
+    updateCoordinates();
+
+    // Reset velocities
+    velocityX = 0;
+    velocityY = 0;
+    velocityZoom = 0.01;
   });
 
   // Initial update of input fields
