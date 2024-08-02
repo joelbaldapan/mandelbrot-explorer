@@ -178,6 +178,16 @@ function RunDemo(loadErrors, loadedShaders) {
     }
   }
 
+  // Download image
+  let pngDataUrl;
+  const downloadBtn = document.getElementById("download-btn");
+  const downloadLink = document.getElementById("canvas-download-link")
+  downloadBtn.addEventListener("click", () => {
+    downloadLink.href = pngDataUrl;
+    downloadLink.download = "mandelbrot.png"; // The filename for the download
+    downloadLink.click();
+  });
+
   // Event listeners to the input fields to set and clear the editing flags
   realInput.addEventListener("focus", () => (isEditingReal = true));
   realInput.addEventListener("blur", () => (isEditingReal = false));
@@ -222,13 +232,6 @@ function RunDemo(loadErrors, loadedShaders) {
     updateInputFields();
   }
 
-  /// Add this after getting the input elements:
-  const applyButton = document.getElementById("apply-coordinates");
-
-  realInput.addEventListener("change", updateCoordinates);
-  imaginaryInput.addEventListener("change", updateCoordinates);
-  zoomInput.addEventListener("change", updateCoordinates);
-
   const loop = function () {
     // Draw
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
@@ -243,12 +246,12 @@ function RunDemo(loadErrors, loadedShaders) {
     gl.uniform1f(uniforms.maxIterations, maxIterations);
 
     gl.drawArrays(gl.TRIANGLES, 0, 6);
+    pngDataUrl = canvas.toDataURL();
 
     // Update input fields with current values
     updateInputFields();
 
     applyMomentum();
-
     requestAnimationFrame(loop);
   };
   requestAnimationFrame(loop);
