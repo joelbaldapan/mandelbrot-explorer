@@ -356,8 +356,8 @@ function RunDemo(loadErrors, loadedShaders) {
   let touchStartX = 0;
   let touchStartY = 0;
   let previousTouchDistance = 0;
-  const mobileZoomMomentumFactor = 3;
-  const mobileMoveMomentumFactor = 0.18;
+  const mobileZoomMomentumFactor = 3.5;
+  const mobileMoveMomentumFactor = 0.2;
   let isPanning = false;
   let isZooming = false;
 
@@ -610,7 +610,7 @@ function RunDemo(loadErrors, loadedShaders) {
       case "flower":
         real = -1.9854;
         imaginary = 0;
-        zoom = 2200;
+        zoom = 2300;
         break;
       case "seahorse-valley":
         real = -0.737532251;
