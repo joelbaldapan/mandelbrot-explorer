@@ -348,4 +348,14 @@ function RunDemo(loadErrors, loadedShaders) {
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
   }
+
+  // Hamburger Menu
+  const hamburgerMenu = document.getElementById("hamburger-menu");
+  const settingsContainer = document.getElementById("settings-container");
+  hamburgerMenu.classList.toggle("change");
+
+  hamburgerMenu.addEventListener("click", () => {
+    hamburgerMenu.classList.toggle("change");
+    settingsContainer.classList.toggle("hidden");
+  });
 }

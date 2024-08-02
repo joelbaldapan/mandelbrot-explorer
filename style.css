@@ -19,10 +19,12 @@ body {
   position: absolute;
 }
 
+/* Settings */
+
 #settings-container {
   z-index: 20;
   position: fixed;
-  padding: 1rem;
+  padding: 2rem;
   color: white;
 
   top: 5vh;
@@ -30,7 +32,7 @@ body {
 }
 
 .setting {
-  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
 .setting h3 {
@@ -122,10 +124,62 @@ body {
   -moz-appearance: textfield;
 }
 
+/* Hamburger Menu */
+
+#hamburger-menu {
+  z-index: 40;
+  position: fixed;
+  padding: 1rem;
+  color: white;
+  top: 6vh;
+  right: 6vh;
+
+  cursor: pointer;
+  padding: 10px;
+}
+
+.bar {
+  width: 25px;
+  height: 3px;
+  background-color: white;
+  margin: 5px 0;
+  transition: 0.4s;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Animation for hamburger to 'x' */
+#hamburger-menu:not(.change) {
+  background: rgba(8, 8, 8, 0.44);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5.3px);
+  -webkit-backdrop-filter: blur(5.3px);
+  border: 1px solid rgba(31, 31, 31, 0.22);
+}
+
+.change .bar:nth-child(1) {
+  transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.change .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.change .bar:nth-child(3) {
+  transform: rotate(45deg) translate(-5px, -6px);
+}
+
 @media (max-width: 750px) {
   #settings-container {
     top: 2vh;
     right: 2vh;
+  }
+  #hamburger-menu {
+    top: 3vh;
+    right: 3vh;
   }
 }
 
