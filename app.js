@@ -666,7 +666,7 @@ function RunDemo(loadErrors, loadedShaders) {
   // Initial startups
   realInput.value = -0.5;
   imaginaryInput.value = 0;
-  zoomInput.value = 1;
+  zoomInput.value = 0.7;
   updateCoordinates();
   updateInputFields();
 }
