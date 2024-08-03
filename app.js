@@ -433,23 +433,14 @@ function RunDemo(loadErrors, loadedShaders) {
       );
 
       const pinchDelta = currentTouchDistance - previousTouchDistance;
-      const zoomFactor = pinchDelta > 0 ? 0.99 : 1.01;
+      const zoomFactor = pinchDelta > 0 ? 1.01 : 0.99; // Changed this line
       velocityZoom = (zoomFactor - 1) * mobileZoomMomentumFactor;
 
       previousTouchDistance = currentTouchDistance;
 
       // Apply zoom immediately for smoother input field updates
-      const iRange = maxI - minI;
-      const rRange = maxR - minR;
-      const centerI = (maxI + minI) / 2;
-      const centerR = (maxR + minR) / 2;
-
-      minI = centerI - (iRange * zoomFactor) / 2;
-      maxI = centerI + (iRange * zoomFactor) / 2;
-      minR = centerR - (rRange * zoomFactor) / 2;
-      maxR = centerR + (rRange * zoomFactor) / 2;
-
-      // Update input fields
+      zoomLevel *= zoomFactor;
+      updateCoordinates();
       updateInputFields();
     }
   }
