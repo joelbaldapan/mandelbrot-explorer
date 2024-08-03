@@ -598,7 +598,7 @@ function RunDemo(loadErrors, loadedShaders) {
         zoom = 1;
         break;
       case "flower":
-        real = -1.9854;
+        real = -1.9854406434;
         imaginary = 0;
         zoom = 2300;
         break;
@@ -628,8 +628,8 @@ function RunDemo(loadErrors, loadedShaders) {
         zoom = 1300;
         break;
       case "vortex":
-        real = -0.7473319722;
-        imaginary = 0.1002953368;
+        real = -0.7473278619;
+        imaginary = 0.1003012304;
         zoom = 9046.45;
         break;
       case "portals":
