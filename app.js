@@ -595,7 +595,7 @@ function RunDemo(loadErrors, loadedShaders) {
       case "home":
         real = -0.5;
         imaginary = 0;
-        zoom = 1.5;
+        zoom = 1;
         break;
       case "flower":
         real = -1.9854;
@@ -605,7 +605,7 @@ function RunDemo(loadErrors, loadedShaders) {
       case "seahorse-valley":
         real = -0.737532251;
         imaginary = 0.1665403958;
-        zoom = 220.89;
+        zoom = 150.89;
         break;
       case "starfish":
         real = -0.417;
@@ -613,9 +613,9 @@ function RunDemo(loadErrors, loadedShaders) {
         zoom = 370;
         break;
       case "elephant-valley":
-        real = 0.2965505633;
-        imaginary = 0.4849154776;
-        zoom = 391.78;
+        real = 0.2966735576;
+        imaginary = 0.4851305008;
+        zoom = 260.78;
         break;
       case "spiral":
         real = -0.764140113;
@@ -643,7 +643,7 @@ function RunDemo(loadErrors, loadedShaders) {
         zoom = 20000.0;
         break;
       case "tendrils":
-        real = -0.2175216301;
+        real = -0.2175429922;
         imaginary = -1.1144508288;
         zoom = 9000.0;
         break;
@@ -663,6 +663,10 @@ function RunDemo(loadErrors, loadedShaders) {
     velocityZoom = -0.01;
   });
 
-  // Initial update of input fields
+  // Initial startups
+  realInput.value = -0.5;
+  imaginaryInput.value = 0;
+  zoomInput.value = 1;
+  updateCoordinates();
   updateInputFields();
 }
